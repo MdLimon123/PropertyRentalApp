@@ -1,6 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:property_rental_app/global.dart';
 import 'package:property_rental_app/utils/app_constan.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -98,6 +101,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           fontSize: 24.0
                       ),
                       controller: _passwordController,
+                      obscureText: true,
                       validator: (passwordValue){
                         if(passwordValue!.length<5){
                           return "Password must be at least 6 or more character";
@@ -188,7 +192,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       style: const TextStyle(
                           fontSize: 24.0
                       ),
-                      controller: _firstNameController,
+                      controller: _bioController,
                       validator: (text){
                         if(text!.isEmpty){
                           return "Please write  your bio";
@@ -205,7 +209,18 @@ class _SignupScreenState extends State<SignupScreen> {
 
             Padding(
               padding: const EdgeInsets.only(top: 38.0),
-              child: MaterialButton(onPressed: (){},
+              child: MaterialButton(onPressed: ()async{
+
+                var imageFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+                if(imageFile !=null){
+                  imageFileOfUser = File(imageFile.path);
+
+                  setState(() {
+                    imageFileOfUser;
+                  });
+                }
+
+              },
               child: imageFileOfUser == null ?
                 const Icon(Icons.add_a_photo)
                 :CircleAvatar(
@@ -225,7 +240,30 @@ class _SignupScreenState extends State<SignupScreen> {
                       backgroundColor: Colors.pink,
 
                   ),
-                  onPressed: (){},
+                  onPressed: (){
+
+                    if(_formKey.currentState!.validate() || imageFileOfUser == null){
+                      Get.snackbar("Field Missing", "Please choose image and fill out complete sign up form.");
+                      return;
+                    }
+                    if(_emailController.text.isEmpty && _passwordController.text.isEmpty){
+                      Get.snackbar("Field Missing", "Please c fill out complete sign up form.");
+                      return;
+                    }
+
+                    userViewModel.signUp(
+                      _emailController.text.trim(),
+                      _passwordController.text.trim(),
+                      _firstNameController.text.trim(),
+                      _lastNameController.text.trim(),
+                      _cityController.text.trim(),
+                      _countryController.text.trim(),
+                      _bioController.text.trim(),
+                        imageFileOfUser
+
+                    );
+
+                  },
                   child: const Text("Create Account",
                     style: TextStyle(
                         fontSize: 20,
