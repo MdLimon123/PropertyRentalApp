@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:property_rental_app/global.dart';
 import 'package:property_rental_app/utils/app_constan.dart';
 import 'package:property_rental_app/view/signup_screen.dart';
 
@@ -67,7 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       controller: _emailTextEditingController,
                       validator: (emailValue){
-                        if(emailValue!.contains("@")){
+                        if(!emailValue!.contains("@")){
                           return "Please write  valid email";
                         }
                         return null;
@@ -83,6 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: const TextStyle(
                           fontSize: 24.0
                       ),
+                      obscureText: true,
                       controller: _passwordController,
                       validator: (passwordValue){
                         if(passwordValue!.length<5){
@@ -100,7 +102,18 @@ class _LoginScreenState extends State<LoginScreen> {
                         backgroundColor: Colors.pink,
                         padding: const EdgeInsets.symmetric(horizontal: 60)
                       ),
-                        onPressed: (){},
+                        onPressed: ()async{
+
+                        if(_formKey.currentState!.validate()){
+
+                        await userViewModel.login(
+                              _emailTextEditingController.text.trim(),
+                              _passwordController.text.trim());
+
+
+                        }
+
+                        },
                         child: const Text("Login",
                         style: TextStyle(
                           fontSize: 20,

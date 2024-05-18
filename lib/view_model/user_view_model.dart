@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:property_rental_app/model/app_constants.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:property_rental_app/view/account_screen.dart';
 
 class UserViewModel{
 
@@ -36,7 +37,11 @@ class UserViewModel{
 
         });
 
+        Get.to(AccountScreen(),
+            transition: Transition.fadeIn);
+
         Get.snackbar("Congratulation", "your account has been created.");
+
 
       });
 
@@ -79,8 +84,76 @@ class UserViewModel{
 
     AppConstants.currentUser.displayImage = MemoryImage(imageFileOfUser.readAsBytesSync());
 
+  }
 
-    
+  login(email, password)async{
+
+    Get.snackbar("Please wait", "checking your credential....");
+
+    try{
+
+      FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: email,
+          password: password).then((result)async{
+
+            String currentUserID = result.user!.uid;
+            AppConstants.currentUser.id = currentUserID;
+
+            await getUserInfoFormFirestore(currentUserID);
+            await getImageFromStorage(currentUserID);
+
+
+            Get.snackbar("Logged-In", "you are logged-in successful");
+            Get.to(AccountScreen(),
+            transition: Transition.fadeIn);
+
+
+      });
+
+
+    }catch(e){
+
+      Get.snackbar("Error", e.toString());
+    }
+
+  }
+
+  getUserInfoFormFirestore(userID)async{
+
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection("users").doc(userID).get();
+
+    AppConstants.currentUser.snapshot = snapshot;
+
+    AppConstants.currentUser.firstName = snapshot["firstName"] ?? "";
+    AppConstants.currentUser.lastName = snapshot["lastName"] ?? "";
+    AppConstants.currentUser.email = snapshot["email"] ?? "";
+    AppConstants.currentUser.bio = snapshot["bio"] ?? "";
+    AppConstants.currentUser.city = snapshot["city"] ?? "";
+    AppConstants.currentUser.country = snapshot["country"] ?? "";
+    AppConstants.currentUser.isHost = snapshot["isHost"] ?? false;
+
+
+  }
+
+
+  getImageFromStorage(userID)async{
+
+    if(AppConstants.currentUser.displayImage !=null){
+      return AppConstants.currentUser.displayImage;
+    }
+
+    final imageDataInBytes = await FirebaseStorage.instance.ref().
+    child("userImages").
+    child(userID).
+    child(userID + ".png")
+    .getData(1024 * 1024);
+
+   AppConstants.currentUser.displayImage = MemoryImage(imageDataInBytes!);
+
+   return AppConstants.currentUser.displayImage;
+
+
+
 
   }
 
