@@ -6,7 +6,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:property_rental_app/model/app_constants.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:property_rental_app/view/account_screen.dart';
+import 'package:property_rental_app/view/guestScreens/account_screen.dart';
+import 'package:property_rental_app/view/guest_home_screen.dart';
 
 class UserViewModel{
 
@@ -37,7 +38,7 @@ class UserViewModel{
 
         });
 
-        Get.to(AccountScreen(),
+        Get.to(GuestHomeScreen(),
             transition: Transition.fadeIn);
 
         Get.snackbar("Congratulation", "your account has been created.");
@@ -104,7 +105,7 @@ class UserViewModel{
 
 
             Get.snackbar("Logged-In", "you are logged-in successful");
-            Get.to(AccountScreen(),
+            Get.to(GuestHomeScreen(),
             transition: Transition.fadeIn);
 
 
