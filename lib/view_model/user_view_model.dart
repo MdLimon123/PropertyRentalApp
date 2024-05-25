@@ -6,10 +6,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:property_rental_app/model/app_constants.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:property_rental_app/view/guestScreens/account_screen.dart';
+import 'package:property_rental_app/model/user_model.dart';
 import 'package:property_rental_app/view/guest_home_screen.dart';
 
 class UserViewModel{
+
+  UserModel userModel = UserModel();
 
   signUp(email, password, firstName, lastName, city, country, bio, imageFileOfUser)async{
 
@@ -153,8 +155,26 @@ class UserViewModel{
 
    return AppConstants.currentUser.displayImage;
 
+  }
+
+  becomeHost(String userID)async{
 
 
+
+    userModel.isHost = true;
+
+    Map<String, dynamic> dataMap = {
+
+      "isHost": true,
+    };
+
+   FirebaseFirestore.instance.collection("users").doc(userID).update(dataMap);
+
+  }
+
+  modifyCurrentHosting(bool isHosting){
+
+    userModel.isCurrentlyHosting = isHosting;
 
   }
 
